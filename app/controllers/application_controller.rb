@@ -73,7 +73,7 @@ class ApplicationController < ActionController::Base
 
     respond_to do |format|
       format.html do
-        flash[:alert] = 'Viewers do not have permission to perform this action'
+        flash[:alert] = I18n.t('not_authorized')
         redirect_to(request.referer || root_path)
       end
       format.json { render json: { error: 'Viewers do not have permission to perform this action' }, status: :forbidden }
@@ -87,7 +87,7 @@ class ApplicationController < ActionController::Base
 
     respond_to do |format|
       format.html do
-        flash[:alert] = 'Viewers do not have access to settings'
+        flash[:alert] = I18n.t('not_authorized')
         redirect_to(root_path)
       end
       format.json { render json: { error: 'Viewers do not have access to settings' }, status: :forbidden }
