@@ -4,7 +4,7 @@
   </div>
 </h1>
 <h3 align="center">
-This is a DocuSeal fork intended for security and privacy upgrades. Consider upstream DocuSeal first.
+This is a DocuSeal fork intended for security and privacy upgrades. It also implements the creation and login of the User via the `Remote-User` header. This allows for seamless integration with systems that use this header for authentication. Consider upstream DocuSeal first.
 </h3>
 
 See:

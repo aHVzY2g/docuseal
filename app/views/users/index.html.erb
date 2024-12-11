@@ -84,6 +84,10 @@
         </tbody>
       </table>
     </div>
+    <a class="text-sm mt-3 px-4 py-2 bg-base-300 rounded-full block" target="_blank" href="<%= Docuseal.multitenant? ? console_redirect_index_path(redir: "#{Docuseal::CONSOLE_URL}/plans") : "#{Docuseal::CLOUD_URL}/sign_up?#{{ redir: "#{Docuseal::CONSOLE_URL}/on_premise" }.to_query}" %>">
+      <%= svg_icon('info_circle', class: 'w-4 h-4 inline align-text-bottom') %>
+      <%= t('disclaimer') %>: <%= t('any_user_details_will_be_overwritten_by_remote_header_if_present') %>
+    </a>
     <% if @pagy.pages > 1 %>
       <%= render 'shared/pagination', pagy: @pagy, items_name: 'users', left_additional_html: render('bottom_links') %>
     <% else %>
