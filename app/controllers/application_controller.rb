@@ -68,6 +68,19 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def check_viewer_role
+    return unless current_user&.role == User::VIEWER_ROLE
+
+    respond_to do |format|
+      format.html do
+        flash[:alert] = 'Viewers do not have permission to perform this action'
+        redirect_to(request.referer || root_path)
+      end
+      format.json { render json: { error: 'Viewers do not have permission to perform this action' }, status: :forbidden }
+      format.any { head :forbidden }
+    end
+  end
+
   def check_viewer_settings_access
     return unless current_user&.role == User::VIEWER_ROLE
     return unless settings_path?
