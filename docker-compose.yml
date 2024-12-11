@@ -11,6 +11,11 @@ services:
     environment:
       - FORCE_SSL=${HOST}
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/docuseal
+      - GROUP_ADMIN=group-admin    # Maps to admin role
+      - GROUP_EDITOR=group-editor  # Maps to editor role
+      - GROUP_VIEWER=group-viewer  # Maps to viewer role
+      - GROUP_MEMBER=group-member  # Maps to member role
+      - GROUP_AGENT=group-agent    # Maps to agent role
 
   postgres:
     image: postgres:15

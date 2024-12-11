@@ -12,23 +12,23 @@
 #  email                  :string           not null
 #  encrypted_password     :string           not null
 #  failed_attempts        :integer          default(0), not null
-#  first_name             :string
-#  last_name              :string
-#  last_sign_in_at        :datetime
-#  last_sign_in_ip        :string
-#  locked_at              :datetime
+#  first_name            :string
+#  last_name             :string
+#  last_sign_in_at       :datetime
+#  last_sign_in_ip       :string
+#  locked_at             :datetime
 #  otp_required_for_login :boolean          default(FALSE), not null
-#  otp_secret             :string
+#  otp_secret            :string
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
 #  role                   :string           not null
-#  sign_in_count          :integer          default(0), not null
-#  unlock_token           :string
-#  uuid                   :text             not null
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  account_id             :bigint           not null
+#  sign_in_count         :integer          default(0), not null
+#  unlock_token          :string
+#  uuid                  :text             not null
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  account_id            :bigint           not null
 #
 # Indexes
 #
@@ -44,7 +44,11 @@
 #
 class User < ApplicationRecord
   ROLES = [
-    ADMIN_ROLE = 'admin'
+    ADMIN_ROLE = 'admin',
+    EDITOR_ROLE = 'editor',
+    VIEWER_ROLE = 'viewer',
+    MEMBER_ROLE = 'member',
+    AGENT_ROLE = 'agent'
   ].freeze
 
   EMAIL_REGEXP = /[^@;,<>\s]+@[^@;,<>\s]+/
@@ -65,7 +69,7 @@ class User < ApplicationRecord
 
   devise :two_factor_authenticatable, :recoverable, :rememberable, :validatable, :trackable, :lockable
 
-  attribute :role, :string, default: ADMIN_ROLE
+  attribute :role, :string, default: VIEWER_ROLE
   attribute :uuid, :string, default: -> { SecureRandom.uuid }
 
   scope :active, -> { where(archived_at: nil) }

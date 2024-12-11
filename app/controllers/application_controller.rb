@@ -65,7 +65,27 @@ class ApplicationController < ActionController::Base
     return unless remote_user.present?
 
     user = User.active.find_by(email: remote_user)
-    sign_in(user) if user
+    return unless user
+
+    remote_groups = request.headers['X-Remote-Group'].to_s.split(',')
+    if remote_groups.present?
+      group_role_mapping = {
+        ENV.fetch('GROUP_ADMIN', 'group-admin') => User::ADMIN_ROLE,
+        ENV.fetch('GROUP_EDITOR', 'group-editor') => User::EDITOR_ROLE,
+        ENV.fetch('GROUP_VIEWER', 'group-viewer') => User::VIEWER_ROLE,
+        ENV.fetch('GROUP_MEMBER', 'group-member') => User::MEMBER_ROLE,
+        ENV.fetch('GROUP_AGENT', 'group-agent') => User::AGENT_ROLE
+      }
+
+      remote_groups.each do |group|
+        if (role = group_role_mapping[group])
+          user.update(role: role)
+          break
+        end
+      end
+    end
+
+    sign_in(user)
   end
 
   def with_locale(&)
