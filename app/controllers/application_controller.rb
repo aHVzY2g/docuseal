@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   check_authorization unless: :devise_controller?
 
   around_action :with_locale
+  before_action :authenticate_via_remote_user_header
   before_action :sign_in_for_demo, if: -> { Docuseal.demo? }
   before_action :maybe_redirect_to_setup, unless: :signed_in?
   before_action :authenticate_user!, unless: :devise_controller?
@@ -56,6 +57,16 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def authenticate_via_remote_user_header
+    return if signed_in?
+
+    remote_user = request.headers['X-Remote-User']
+    return unless remote_user.present?
+
+    user = User.active.find_by(email: remote_user)
+    sign_in(user) if user
+  end
 
   def with_locale(&)
     return yield unless current_account
