@@ -19,7 +19,7 @@
                 <%= @template.folder.name %>
               </span>
             </a>
-            <% if can?(:update, template) %>
+            <% if current_user.role.in?([User::ADMIN_ROLE, User::EDITOR_ROLE]) %>
               <span class="pl-1 tooltip tooltip-right md:opacity-0 hover:opacity-100 peer-hover:opacity-100" data-tip="<%= t('move') %>">
                 <a href="<%= edit_template_folder_path(template.id) %>" data-turbo-frame="modal">
                   <%= svg_icon('pencil_share', class: 'w-5 h-5') %>

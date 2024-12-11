@@ -13,11 +13,16 @@ class ApplicationController < ActionController::Base
   before_action :sign_in_for_demo, if: -> { Docuseal.demo? }
   before_action :maybe_redirect_to_setup, unless: :signed_in?
   before_action :authenticate_user!, unless: :devise_controller?
+  before_action :check_viewer_settings_access
 
   helper_method :button_title,
                 :current_account,
                 :form_link_host,
-                :svg_icon
+                :svg_icon,
+                :user_is_admin?,
+                :user_is_editor?,
+                :user_can_manage_templates?,
+                :user_can_manage_submissions?
 
   impersonates :user, with: ->(uuid) { User.find_by(uuid:) }
 
@@ -31,11 +36,16 @@ class ApplicationController < ActionController::Base
     redirect_to request.referer, alert: 'Too many requests', status: :too_many_requests
   end
 
-  if Rails.env.production?
-    rescue_from CanCan::AccessDenied do |e|
-      Rollbar.warning(e) if defined?(Rollbar)
+  rescue_from CanCan::AccessDenied do |e|
+    Rollbar.warning(e) if defined?(Rollbar)
 
-      redirect_to root_path, alert: e.message
+    respond_to do |format|
+      format.html do
+        flash[:alert] = e.message
+        redirect_to(request.referer || root_path)
+      end
+      format.json { render json: { error: e.message }, status: :forbidden }
+      format.any { head :forbidden }
     end
   end
 
@@ -57,6 +67,45 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def check_viewer_settings_access
+    return unless current_user&.role == User::VIEWER_ROLE
+    return unless settings_path?
+
+    respond_to do |format|
+      format.html do
+        flash[:alert] = 'Viewers do not have access to settings'
+        redirect_to(root_path)
+      end
+      format.json { render json: { error: 'Viewers do not have access to settings' }, status: :forbidden }
+      format.any { head :forbidden }
+    end
+  end
+
+  def settings_path?
+    # Check if current path is settings-related
+    request.path.start_with?('/settings') ||
+      request.path.include?('_settings') ||
+      request.path == '/users' ||
+      request.path.start_with?('/api/users')
+  end
+
+  # Role-based helper methods
+  def user_is_admin?
+    current_user&.role == User::ADMIN_ROLE
+  end
+
+  def user_is_editor?
+    current_user&.role == User::EDITOR_ROLE
+  end
+
+  def user_can_manage_templates?
+    can?(:manage, Template)
+  end
+
+  def user_can_manage_submissions?
+    can?(:manage, Submission)
+  end
 
   def authenticate_via_remote_user_header
     return if signed_in?
@@ -99,7 +148,6 @@ class ApplicationController < ActionController::Base
     if (remote_name = request.headers['X-Remote-Name'].presence)
       name_parts = remote_name.split
       if name_parts.size >= 2
-        # If there are 3 or more parts, treat all but the last as first name
         user.first_name = name_parts[0...-1].join(' ')
         user.last_name = name_parts.last
         user.save

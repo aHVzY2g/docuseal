@@ -16,7 +16,9 @@
       <% else %>
         <div class="flex items-center justify-center space-x-4 mr-1">
           <%= render 'shared/navbar_buttons' %>
-          <%= link_to t('settings'), settings_profile_index_path, class: 'hidden md:inline-flex font-medium text-lg' %>
+          <% if current_user.role != User::VIEWER_ROLE %>
+            <%= link_to t('settings'), settings_profile_index_path, class: 'hidden md:inline-flex font-medium text-lg' %>
+          <% end %>
         </div>
       <% end %>
       <div class="dropdown dropdown-end">
@@ -24,12 +26,14 @@
           <span class="text-sm align-text-top"><%= current_user.initials %></span>
         </label>
         <ul tabindex="0" class="z-10 dropdown-content p-2 mt-2 shadow menu text-base bg-base-100 rounded-box min-w-[160px] text-right">
-          <li>
-            <%= link_to settings_profile_index_path, class: 'flex items-center' do %>
-              <%= svg_icon('adjustments', class: 'w-5 h-5 flex-shrink-0 stroke-2') %>
-              <span class="mr-1"><%= t('profile') %></span>
-            <% end %>
-          </li>
+          <% if current_user.role != User::VIEWER_ROLE %>
+            <li>
+              <%= link_to settings_profile_index_path, class: 'flex items-center' do %>
+                <%= svg_icon('adjustments', class: 'w-5 h-5 flex-shrink-0 stroke-2') %>
+                <span class="mr-1"><%= t('profile') %></span>
+              <% end %>
+            </li>
+          <% end %>
           <% if !Docuseal.demo? && can?(:manage, EncryptedConfig) %>
             <li>
               <%= link_to Docuseal.multitenant? ? console_redirect_index_path : Docuseal::CONSOLE_URL, data: { prefetch: false }, class: 'flex items-center' do %>

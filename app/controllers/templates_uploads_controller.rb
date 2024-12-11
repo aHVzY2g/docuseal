@@ -2,6 +2,9 @@
 
 class TemplatesUploadsController < ApplicationController
   load_and_authorize_resource :template, parent: false
+  authorize_resource class: Template # Ensure authorization check for new/create actions
+
+  before_action :check_viewer_role
 
   layout 'plain'
 
@@ -71,6 +74,12 @@ class TemplatesUploadsController < ApplicationController
     WebhookUrls.for_account_id(template.account_id, 'template.created').each do |webhook_url|
       SendTemplateCreatedWebhookRequestJob.perform_async('template_id' => template.id,
                                                          'webhook_url_id' => webhook_url.id)
+    end
+  end
+
+  def check_viewer_role
+    if current_user.role == User::VIEWER_ROLE
+      redirect_to root_path, alert: I18n.t('not_authorized')
     end
   end
 end

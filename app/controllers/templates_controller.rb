@@ -2,8 +2,10 @@
 
 class TemplatesController < ApplicationController
   load_and_authorize_resource :template
+  authorize_resource class: Template # Ensure authorization check for new/create actions
 
   before_action :load_base_template, only: %i[new create]
+  before_action :check_viewer_role, only: %i[new create edit update destroy]
 
   def show
     submissions = @template.submissions.accessible_by(current_ability)

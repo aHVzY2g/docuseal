@@ -27,6 +27,7 @@ en: &en
   adding: Adding
   owner: Owner
   select_user: Select user
+  not_authorized: Not authorized
   team_member_permissions: Team member permissions
   entire_team: Entire team
   admin_only: Admin only

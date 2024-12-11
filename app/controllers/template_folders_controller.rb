@@ -13,6 +13,10 @@ class TemplateFoldersController < ApplicationController
   def edit; end
 
   def update
+    unless [User::ADMIN_ROLE, User::EDITOR_ROLE].include?(current_user.role)
+      return redirect_to folder_path(@template_folder), alert: I18n.t('not_authorized')
+    end
+
     if @template_folder != current_account.default_template_folder &&
        @template_folder.update(template_folder_params)
       redirect_to folder_path(@template_folder), notice: I18n.t('folder_name_has_been_updated')
