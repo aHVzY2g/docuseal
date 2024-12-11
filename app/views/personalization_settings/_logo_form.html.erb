@@ -1,1 +1,39 @@
-<%= render 'logo_placeholder' %>
+<div class="w-full max-w-lg">
+  <%= form_tag settings_personalization_logo_path, method: :put, multipart: true, class: 'space-y-4' do %>
+    <div class="flex items-center justify-center w-full">
+      <label for="logo-upload" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          <%= svg_icon('upload', class: 'w-10 h-10 mb-3 text-gray-400') %>
+          <p class="mb-2 text-sm text-gray-500">
+            <span class="font-semibold">Click to upload</span> or drag and drop
+          </p>
+          <p class="text-xs text-gray-500">PNG files only</p>
+        </div>
+        <%= file_field_tag 'logo', accept: 'image/png', class: 'hidden', id: 'logo-upload' %>
+      </div>
+    </label>
+
+    <div class="flex justify-end">
+      <%= submit_tag t('save'), class: 'button button-primary' %>
+    </div>
+  <% end %>
+
+  <% if current_account.logo.attached? %>
+    <div class="mt-4">
+      <div class="flex items-center justify-between p-4 bg-white rounded-lg border">
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12">
+            <%= render 'shared/logo', width: 48, height: 48 %>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-900">Current Logo</p>
+          </div>
+        </div>
+        <%= button_to t('remove'), settings_personalization_logo_path, 
+                     method: :delete, 
+                     class: 'button button-danger-outline',
+                     data: { confirm: t('are_you_sure') } %>
+      </div>
+    </div>
+  <% end %>
+</div>

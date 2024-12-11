@@ -1,15 +1,7 @@
-<div class="alert my-4">
-  <%= svg_icon('info_circle', class: 'w-6 h-6') %>
-  <div>
-    <p class="font-bold">
-      <%= t('unlock_with_docuseal_pro') %>
-    </p>
-    <p>
-      <%= t('display_your_company_name_and_logo_when_signing_documents') %>
-      <br>
-      <a class="link font-medium" target="_blank" href="<%= Docuseal.multitenant? ? console_redirect_index_path(redir: "#{Docuseal::CONSOLE_URL}/plans") : "#{Docuseal::CLOUD_URL}/sign_up?#{{ redir: "#{Docuseal::CONSOLE_URL}/on_premise" }.to_query}" %>" data-turbo="false">
-        <%= t('learn_more') %>
-      </a>
-    </p>
+<div class="flex items-center justify-center w-full">
+  <div class="text-center">
+    <%= svg_icon('image', class: 'w-16 h-16 mx-auto mb-4 text-gray-400') %>
+    <h3 class="mb-2 text-lg font-medium text-gray-900">No Logo Uploaded</h3>
+    <p class="text-sm text-gray-500">Upload your company logo to display it on your documents</p>
   </div>
 </div>

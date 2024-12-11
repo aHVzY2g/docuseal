@@ -16,8 +16,12 @@ module PdfIcons
     StringIO.new(paperclip_data)
   end
 
-  def logo_io
-    StringIO.new(logo_data)
+  def logo_io(account = nil)
+    if account&.logo&.attached?
+      StringIO.new(account.logo.download)
+    else
+      StringIO.new(logo_data)
+    end
   end
 
   def logo_new_io
@@ -38,5 +42,11 @@ module PdfIcons
 
   def logo_new_data
     @logo_new_data ||= PATH.join('logo_new.png').read
+  end
+
+  def account_logo_data(account)
+    return logo_data unless account&.logo&.attached?
+
+    account.logo.download
   end
 end

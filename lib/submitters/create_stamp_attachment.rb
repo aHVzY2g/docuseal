@@ -97,8 +97,8 @@ module Submitters
       Vips::Image.text(text, width: WIDTH, height: HEIGHT, wrap: :'word-char')
     end
 
-    def load_logo(_submitter)
-      PdfIcons.logo_io
+    def load_logo(submitter)
+      PdfIcons.logo_io(submitter.submission.account)
     end
   end
 end

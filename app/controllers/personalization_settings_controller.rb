@@ -34,6 +34,39 @@ class PersonalizationSettingsController < ApplicationController
     redirect_back(fallback_location: settings_personalization_path, notice: I18n.t('settings_have_been_saved'))
   end
 
+  def logo
+    authorize!(:update, current_account)
+
+    if params[:logo].present?
+      if params[:logo].content_type != 'image/png'
+        return redirect_back(fallback_location: settings_personalization_path, 
+                           alert: 'Only PNG files are allowed')
+      end
+
+      # Read the PNG content and attach it
+      png_content = params[:logo].read
+      blob = ActiveStorage::Blob.create_and_upload!(
+        io: StringIO.new(png_content),
+        filename: params[:logo].original_filename,
+        content_type: 'image/png'
+      )
+      
+      current_account.logo.attach(blob)
+      notice = 'Logo has been updated successfully'
+    end
+
+    redirect_back(fallback_location: settings_personalization_path, notice: notice)
+  end
+
+  def delete_logo
+    authorize!(:update, current_account)
+
+    current_account.logo.purge if current_account.logo.attached?
+
+    redirect_back(fallback_location: settings_personalization_path, 
+                 notice: 'Logo has been removed successfully')
+  end
+
   private
 
   def load_and_authorize_account_config
