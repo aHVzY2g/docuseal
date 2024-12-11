@@ -16,6 +16,7 @@ services:
       - GROUP_VIEWER=group-viewer  # Maps to viewer role
       - GROUP_MEMBER=group-member  # Maps to member role
       - GROUP_AGENT=group-agent    # Maps to agent role
+      - AUTOCREATE_USERS=true
 
   postgres:
     image: postgres:15

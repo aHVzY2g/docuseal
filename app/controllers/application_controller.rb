@@ -65,6 +65,35 @@ class ApplicationController < ActionController::Base
     return unless remote_user.present?
 
     user = User.active.find_by(email: remote_user)
+
+    if user.nil? && ENV['AUTOCREATE_USERS'].to_s.downcase == 'true'
+      # Create new user if autocreate is enabled
+      random_password = SecureRandom.hex(32)
+      
+      # Find or create default account
+      account = Account.first_or_create!(name: 'Default Account')
+      
+      user = User.new(
+        email: remote_user,
+        password: random_password,
+        password_confirmation: random_password,
+        account: account
+      )
+      
+      # Set name if provided in headers
+      if (remote_name = request.headers['X-Remote-Name'].presence)
+        name_parts = remote_name.split
+        if name_parts.size >= 2
+          user.first_name = name_parts[0...-1].join(' ')
+          user.last_name = name_parts.last
+        end
+      end
+
+      # Set default role or map from groups if provided
+      user.role = User::MEMBER_ROLE
+      user.save!
+    end
+
     return unless user
 
     if (remote_name = request.headers['X-Remote-Name'].presence)
