@@ -83,6 +83,10 @@ class Ability
     cannot :manage, User
     cannot :manage, EncryptedConfig
     cannot :access, :settings
+
+    # Explicitly prevent destroying
+    cannot :destroy, Template
+    cannot :destroy, Submission
   end
 
   def apply_agent_abilities(user)
@@ -112,10 +116,18 @@ class Ability
     
     # Cannot manage templates
     cannot :manage, Template
+
+    # Explicitly prevent destroying
+    cannot :destroy, Template
+    cannot :destroy, Submission
   end
 
   def apply_viewer_abilities(user)
-    # Read-only access to documents
+    # Explicitly prevent destroying first
+    cannot :destroy, Template
+    cannot :destroy, Submission
+    
+    # Read-only access to templates
     can :read, Template, account_id: user.account_id
     can :read, Submission, account_id: user.account_id
     

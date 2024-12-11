@@ -2,6 +2,7 @@
 
 class SubmissionsArchivedController < ApplicationController
   load_and_authorize_resource :submission, parent: false
+  before_action :check_viewer_role, only: %i[new create edit update destroy]
 
   def index
     @submissions = @submissions.joins(:template)

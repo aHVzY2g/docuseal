@@ -94,8 +94,6 @@ class TemplatesController < ApplicationController
   end
 
   def destroy
-    authorize! :archive, @template
-    
     notice =
       if params[:permanently].present?
         @template.destroy!

@@ -5,6 +5,7 @@ class SubmissionsController < ApplicationController
   authorize_resource :template, only: %i[new create]
 
   load_and_authorize_resource :submission, only: %i[show destroy]
+  before_action :check_viewer_role, only: %i[new create edit update destroy]
 
   prepend_before_action :maybe_redirect_com, only: %i[show]
 
@@ -60,7 +61,6 @@ class SubmissionsController < ApplicationController
   end
 
   def destroy
-    authorize! :archive, @submission
 
     notice =
       if params[:permanently].present?
