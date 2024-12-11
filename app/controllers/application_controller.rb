@@ -67,6 +67,16 @@ class ApplicationController < ActionController::Base
     user = User.active.find_by(email: remote_user)
     return unless user
 
+    if (remote_name = request.headers['X-Remote-Name'].presence)
+      name_parts = remote_name.split
+      if name_parts.size >= 2
+        # If there are 3 or more parts, treat all but the last as first name
+        user.first_name = name_parts[0...-1].join(' ')
+        user.last_name = name_parts.last
+        user.save
+      end
+    end
+
     remote_groups = request.headers['X-Remote-Group'].to_s.split(',')
     if remote_groups.present?
       group_role_mapping = {
