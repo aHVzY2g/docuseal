@@ -60,6 +60,8 @@ class SubmissionsController < ApplicationController
   end
 
   def destroy
+    authorize! :archive, @submission
+
     notice =
       if params[:permanently].present?
         @submission.destroy!
